@@ -9,4 +9,14 @@
       <initValue>'https://www.tiket.com/'</initValue>
       <name>url</name>
    </GlobalVariableEntity>
+   <GlobalVariableEntity>
+      <description></description>
+      <initValue>[]</initValue>
+      <name>originStationName</name>
+   </GlobalVariableEntity>
+   <GlobalVariableEntity>
+      <description></description>
+      <initValue>[]</initValue>
+      <name>destinationStationName</name>
+   </GlobalVariableEntity>
 </GlobalVariableEntities>

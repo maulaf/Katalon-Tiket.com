@@ -1,10 +1,10 @@
 {
-  "keywordFileContentHash": "45C1896F85F90145B1CBEB7982209CDF",
+  "keywordFileContentHash": "2E5549BE5AB2144473D1AB35E7609AAC",
   "keywordClasses": [
     {
       "name": "keretaAPI.stepsKeretaAPI",
       "keywordMethods": []
     }
   ],
-  "javadocParsed": true
+  "javadocParsed": false
 }

@@ -7,6 +7,7 @@ import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 import com.kms.katalon.core.annotation.Keyword
 import com.kms.katalon.core.checkpoint.Checkpoint
 import com.kms.katalon.core.checkpoint.CheckpointFactory
+import com.kms.katalon.core.cucumber.keyword.CucumberBuiltinKeywords as CucumberKW
 import com.kms.katalon.core.mobile.keyword.MobileBuiltInKeywords as Mobile
 import com.kms.katalon.core.model.FailureHandling
 import com.kms.katalon.core.testcase.TestCase
@@ -17,14 +18,17 @@ import com.kms.katalon.core.testobject.ObjectRepository
 import com.kms.katalon.core.testobject.TestObject
 import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+import com.kms.katalon.core.webui.keyword.internal.WebUIAbstractKeyword
 
 import internal.GlobalVariable
 
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.WebDriver
+import org.apache.commons.lang.RandomStringUtils
 import org.openqa.selenium.By
 
 import com.kms.katalon.core.mobile.keyword.internal.MobileDriverFactory
+import com.kms.katalon.core.webui.common.WebUiCommonHelper
 import com.kms.katalon.core.webui.driver.DriverFactory
 
 import com.kms.katalon.core.testobject.RequestObject
@@ -42,6 +46,11 @@ import cucumber.api.java.en.Given
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
 
+import java.time.format.DateTimeFormatter
+import java.time.LocalDate
+
+import org.openqa.selenium.JavascriptExecutor
+import org.openqa.selenium.Keys
 
 
 class stepsKeretaAPI {
@@ -57,22 +66,190 @@ class stepsKeretaAPI {
 
 	@When("pengguna memilih menu Kereta Api")
 	def menuKA() {
-		
-		WebUI.click(findTestObject('Object Repository/Kereta API/menu_Kereta API'))		
-		WebUI.verifyElementPresent(findTestObject('Object Repository/Kereta API/input_Departure City'), 0)		
-		WebUI.verifyElementPresent(findTestObject('Object Repository/Kereta API/input_Arrival City'), 0)		
+		WebUI.click(findTestObject('Object Repository/Kereta API/menu_Kereta API'))
+		WebUI.verifyElementPresent(findTestObject('Object Repository/Kereta API/input_Departure City'), 0)
+		WebUI.verifyElementPresent(findTestObject('Object Repository/Kereta API/input_Arrival City'), 0)
 		WebUI.verifyElementPresent(findTestObject('Object Repository/Kereta API/input_Departure City'), 0)
 		WebUI.verifyElementPresent(findTestObject('Object Repository/Kereta API/btn_Cari Kereta API'), 0)
 	}
-	
+
 	@And("pengguna memasukkan kota asal (.*)")
 	def inputDepartureCity(String departureCity) {
 		WebUI.setText(findTestObject('Object Repository/Kereta API/input_Departure City'), departureCity)
 		WebUI.verifyElementAttributeValue(findTestObject('Object Repository/Kereta API/input_Departure City'), 'value', departureCity, 0)
+	
+		String xpath = "(//div[@class='station-name'])"
+		TestObject object = new TestObject().addProperty('xpath', ConditionType.EQUALS, xpath)
+		
+		List<TestObject> element = WebUI.findWebElements(object, 30)
+		
+		int count = element.size()
+		
+		List<String> originStationName = []
+		
+		for (int i = 1; i <= count; i++) {
+			TestObject objectStation = new TestObject().addProperty('xpath', ConditionType.EQUALS, "$xpath[$i]")
+			String stationName = WebUI.getText(objectStation)
+			originStationName.add(stationName)
+		}
+		
+		GlobalVariable.originStationName = originStationName
+		println("originStationName = $GlobalVariable.originStationName")
+		
+		WebUI.click(new TestObject().addProperty("xpath", ConditionType.EQUALS, "(//div[@class='station-city'])[1]"))
+		
 	}
 
-	@Then("I verify the (.*) in step")
-	def I_verify_the_status_in_step(String status) {
-		println status
+	@And("pengguna memasukkan kota tujuan (.*)")
+	def inputArrivalCity(String arrivalCity) {
+		WebUI.setText(findTestObject('Object Repository/Kereta API/input_Arrival City'), arrivalCity)
+		WebUI.verifyElementAttributeValue(findTestObject('Object Repository/Kereta API/input_Arrival City'), 'value', arrivalCity, 0)
+		
+		String xpath = "(//div[@class='station-name'])"
+		TestObject object = new TestObject().addProperty('xpath', ConditionType.EQUALS, xpath)
+		
+		List<TestObject> element = WebUI.findWebElements(object, 30)
+		
+		int count = element.size()
+		
+		List<String> destinationStationName = []
+		
+		for (int i = 1; i <= count; i++) {
+			TestObject objectStation = new TestObject().addProperty('xpath', ConditionType.EQUALS, "$xpath[$i]")
+			String stationName = WebUI.getText(objectStation)
+			destinationStationName.add(stationName)
+		}
+		
+		GlobalVariable.destinationStationName = destinationStationName
+		println("destinationStationName = $GlobalVariable.destinationStationName")
+		
+		WebUI.click(new TestObject().addProperty("xpath", ConditionType.EQUALS, "(//div[@class='station-city'])[1]"))
 	}
+
+	@And("pengguna memilih tanggal keberangkatan (.*)")
+	def inputDepartDate(def departDate) {
+		DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+		DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", new java.util.Locale("id"))
+		
+		LocalDate dateDepart = LocalDate.parse(departDate, inputFormatter)
+		String formattedDate = dateDepart.format(outputFormatter)
+		println('Formatted departure date: ' + formattedDate)
+		
+		if (dateDepart.isBefore(LocalDate.now())) {
+			throw new Exception("Tanggal keberangkatan tidak valid, tidak dapat melakukan pemesanan.")
+		}
+		
+		String new_xpath = "//td[contains(@aria-label,'$formattedDate')]"
+		println("new_xpath = $new_xpath")
+		
+		TestObject dynamicObject = new TestObject('dynamicObject').addProperty('xpath', ConditionType.EQUALS, new_xpath)
+		
+		boolean departDatePresent = WebUI.verifyElementVisible(dynamicObject, FailureHandling.OPTIONAL)
+		
+		while (!(departDatePresent)) {
+			TestObject nextMonth = new TestObject().addProperty('xpath', ConditionType.EQUALS, '//span[@class=\'widget-date-prev-next-logo\']/i[@class=\'tix tix-chevron-right\']')
+			WebUI.click(nextMonth)
+			departDatePresent = WebUI.verifyElementVisible(dynamicObject, FailureHandling.OPTIONAL)
+		}
+		
+		WebUI.click(dynamicObject)
+	}
+	
+	@And("pengguna memilih penumpang : (\\d+) dewasa, (\\d+) bayi")
+	def inputPenumpang(int totalAdult, int totalInfant) {
+	
+		int totalPassenger = totalAdult + totalInfant
+		
+		if (totalPassenger > 8) {
+			throw new Exception("Anda hanya dapat memesan maksimal 8 penumpang.");
+		}
+		
+		if (totalAdult < 1) {
+			throw new Exception("Minimal memesan 1 penumpang dewasa.");
+		}
+		
+		if (totalAdult > 4 || totalInfant > 4) {
+			throw new Exception("Maksimal 4 penumpang dewasa atau bayi.");
+		}
+		
+		WebUI.click(findTestObject('Object Repository/Kereta API/input_Penumpang'))
+		
+		for (int i = 1; i < totalAdult; i++) {
+			if ((totalAdult != 1)) {
+				WebUI.click(findTestObject('Object Repository/Kereta API/increment_Adult'))
+			}
+		}
+		
+		for (int i = 0; i < totalInfant; i++) {
+			if (totalInfant != 0) {
+				WebUI.click(findTestObject('Object Repository/Kereta API/increment_Infant'))
+			}
+		}
+		
+		WebUI.click(findTestObject('Object Repository/Kereta API/btn_Selesai'))
+	}
+		
+	@And("pengguna menekan tombol Cari")
+	def clickCari() {	
+		WebUI.click(findTestObject('Object Repository/Kereta API/btn_Cari Kereta API'))
+		TestObject lewati = new TestObject().addProperty("xpath", ConditionType.EQUALS, "//button[.='Lewati']")
+		boolean isPresent = WebUI.verifyElementVisible(lewati, FailureHandling.OPTIONAL)
+		
+		if (isPresent) {
+			WebUI.click(lewati)
+		}
+	}
+	
+	@Then("sistem menampilkan daftar kereta api yang tersedia dari (.*) ke (.*) pada tanggal (.*)")
+	def verifyCariTiket(String deapartureCity, String arrivalCity, def departDate ) {
+		
+		DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+		DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("d MMM yy", new java.util.Locale("id"))
+		
+		LocalDate dateDepart = LocalDate.parse(departDate, inputFormatter)
+		String formattedDate = dateDepart.format(outputFormatter)
+		println('Formatted departure date: ' + formattedDate)
+		
+		String getDate = WebUI.getText(new TestObject().addProperty("class", ConditionType.EQUALS, "ChangeSearch_departure_date__d7iOq Text_text__DSnue Text_size_b2__y3Q2E Text_weight_bold__m4BAY"))
+		assert getDate.contains(formattedDate)
+		
+		boolean isOriginTextPresent = false
+		
+		// Loop through each station name in the list
+		for (String originStationName : GlobalVariable.originStationName) {
+			// Verify if the station name text is present on the page
+			if (WebUI.verifyTextPresent(originStationName, false, FailureHandling.OPTIONAL)) {
+				isOriginTextPresent = true
+				println("Text '$originStationName' is present on the page.")
+			}
+		}
+		
+		if (!isOriginTextPresent) {
+			println("None of the origin are present on the page.")
+			throw new AssertionError("Verification failed: None of the origin are present on the page.")
+		} else {
+			println("At least one of the specified origin is present on the page.")
+		}
+		
+		boolean isDestinationTextPresent = false
+		
+		// Loop through each station name in the list
+		for (String destinationStationName : GlobalVariable.destinationStationName) {
+			// Verify if the station name text is present on the page
+			if (WebUI.verifyTextPresent(destinationStationName, false, FailureHandling.OPTIONAL)) {
+				isDestinationTextPresent = true
+				println("Text '$destinationStationName' is present on the page.")
+			}
+		}
+		
+		if (!isDestinationTextPresent) {
+			println("None of the destination are present on the page.")
+			throw new AssertionError("Verification failed: None of the destination are present on the page.")
+		} else {
+			println("At least one of the specified destination is present on the page.")
+		}
+		
+		
+	}
+	
 }
