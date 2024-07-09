@@ -49,7 +49,7 @@ class stepsFilter {
 
 	@Given("pengguna berada di halaman hasil pencarian kereta api")
 	def hasilCariTiket() {
-		WebUI.callTestCase(findTestCase('mencari tiket kereta api'), [:], FailureHandling.STOP_ON_FAILURE)
+		WebUI.callTestCase(findTestCase('Mencari Kereta Api'), [:], FailureHandling.STOP_ON_FAILURE)
 	}
 
 	@When("pengguna memilih kelas (.*) dari opsi filter")

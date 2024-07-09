@@ -27,3 +27,13 @@ Feature: Pemesanan Tiket Kereta API
   	 Examples: 
       | classKA  | 
       | EKO	 		 |
+      
+      
+    @inputDataPenumpang
+    Scenario: Mengisi Data Penumpang Saat Memesan Tiket
+    Given pengguna memilih kereta dan berada di halaman pengisian data penumpang
+    When pengguna mengisi detail penumpang
+    And pengguna menekan tombol Lanjutkan
+    Then sistem menampilkan halaman Kursi & Perlindungan
+  
+    

@@ -186,6 +186,7 @@ class stepsSeacrhTiket {
 		}
 
 		WebUI.click(findTestObject('Object Repository/Kereta API/btn_Selesai'))
+
 	}
 
 	@And("pengguna menekan tombol Cari")
