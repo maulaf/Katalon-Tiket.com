@@ -15,3 +15,15 @@ Feature: Pemesanan Tiket Kereta API
     Examples: 
       | departureCity  | arrivalCity | departDate  | totalAdult | totalInfant |
       | jakarta				 |   bandung	 | 20240714		 |		1				|			1 			|
+      
+   
+   @filterKereta
+  	Scenario Outline: Memfilter tipe kelas Kereta API
+  	Given pengguna berada di halaman hasil pencarian kereta api
+  	When pengguna memilih kelas <classKA> dari opsi filter
+  	And pengguna menekan tombol simpan
+  	Then sistem menampilkan halaman detail kereta api kelas <classKA> yang dipilih
+  	
+  	 Examples: 
+      | classKA  | 
+      | EKO	 |
