@@ -127,7 +127,7 @@ class stepsSeacrhTiket {
 
 	@And("pengguna memilih tanggal keberangkatan (.*)")
 	def inputDepartDate(def departDate) {
-		DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+		DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 		DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", new java.util.Locale("id"))
 
 		LocalDate dateDepart = LocalDate.parse(departDate, inputFormatter)
@@ -202,7 +202,7 @@ class stepsSeacrhTiket {
 	@Then("sistem menampilkan daftar kereta api yang tersedia dari (.*) ke (.*) pada tanggal (.*)")
 	def verifyCariTiket(String deapartureCity, String arrivalCity, def departDate ) {
 
-		DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+		DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 		DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("d MMM yy", new java.util.Locale("id"))
 
 		LocalDate dateDepart = LocalDate.parse(departDate, inputFormatter)

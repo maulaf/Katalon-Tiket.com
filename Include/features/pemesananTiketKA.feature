@@ -1,7 +1,7 @@
 @bookingTicketKA
 Feature: Pemesanan Tiket Kereta API
 
-  @cariTiket
+  @cariKereta
   Scenario Outline: Mencari Kereta API
     Given pengguna berada di halaman utama aplikasi tiket.com
     When pengguna memilih menu Kereta Api
@@ -14,7 +14,7 @@ Feature: Pemesanan Tiket Kereta API
 
     Examples: 
       | departureCity  | arrivalCity | departDate  | totalAdult | totalInfant |
-      | jakarta				 |   bandung	 | 20240714		 |		1				|			1 			|
+      | jakarta				 |   bandung	 | 14-07-2024	 |		1				|			1 			|
       
    
    @filterKereta
@@ -26,4 +26,4 @@ Feature: Pemesanan Tiket Kereta API
   	
   	 Examples: 
       | classKA  | 
-      | EKO	 |
+      | EKO	 		 |

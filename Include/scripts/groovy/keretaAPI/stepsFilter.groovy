@@ -56,13 +56,12 @@ class stepsFilter {
 	def pilihKelas(String classKA) {
 		WebUI.click(findTestObject('Object Repository/Kereta API/btn_Filter dan Urutkan'))
 		WebUI.click(findTestObject('Object Repository/Kereta API/text_Tipe Kelas'))
-		
+
 		TestObject checkbox = findTestObject('Object Repository/Kereta API/checkbox_Tipe Kelas', [('classKA') : classKA])
 		WebElement element = WebUiCommonHelper.findWebElement(checkbox, 30)
 		WebUI.executeJavaScript("arguments[0].click();", Arrays.asList(element))
-		
 	}
-	
+
 	@And("pengguna menekan tombol simpan")
 	def clickSimpan() {
 		WebUI.click(findTestObject('Object Repository/Kereta API/btn_Simpan'))
@@ -77,21 +76,18 @@ class stepsFilter {
 		List<TestObject> element = WebUI.findWebElements(object, 30)
 
 		int count = element.size()
-		
+
 		for(int i=1; i<=count; i++) {
 			String new_xpath = xpath + "[$i]"
 			println(new_xpath)
-			
+
 			String getText = WebUI.getText(new TestObject().addProperty("xpath", ConditionType.EQUALS, new_xpath))
-			
+
 			if(classKA == "EKO") {
 				assert getText.contains("Ekonomi")
 			}else if((classKA == "EKS")) {
 				assert getText.contains("Eksekutif")
 			}
-			
 		}
-		
-		
 	}
 }
