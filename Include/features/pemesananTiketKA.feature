@@ -14,7 +14,7 @@ Feature: Pemesanan Tiket Kereta API
 
     Examples: 
       | departureCity  | arrivalCity | departDate  | totalAdult | totalInfant |
-      | jakarta				 |   bandung	 | 14-07-2024	 |		1				|			1 			|
+      | jakarta				 |   bandung	 | 14-07-2024	 |		2				|			1 			|
       
    
    @filterKereta

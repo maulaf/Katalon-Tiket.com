@@ -68,7 +68,7 @@ class stepsDetailPemesanan {
 		List<TestObject> element = WebUI.findWebElements(object, 30)
 
 		int count = element.size()
-		
+
 		for (int i=1; i<=count; i++) {
 			int a = i + 1
 			String new_xpath = xpath + "[$a]";
@@ -80,12 +80,12 @@ class stepsDetailPemesanan {
 				break;
 			}
 		}
-		
+
 		for (int i=1; i<=count; i++) {
 			dataPenumpang(i)
 		}
 	}
-	
+
 	@And("pengguna menekan tombol Lanjutkan")
 	def clickLanjutkan() {
 		WebUI.scrollToElement(findTestObject('Object Repository/Kereta API/btn_Lanjutkan'), 0)
@@ -142,7 +142,7 @@ class stepsDetailPemesanan {
 		def firstName = faker.name().firstName().replaceAll('[^a-zA-Z0-9]', '')
 		def lastName = faker.name().lastName().replaceAll('[^a-zA-Z0-9]', '')
 		def fullName = firstName + " " + lastName
-		def nik = RandomStringUtils.randomNumeric(16)
+		def nik = "1" + RandomStringUtils.randomNumeric(15)
 
 		String radio_xpath = "(//span[.='$prefix'])[$i+1]"
 
