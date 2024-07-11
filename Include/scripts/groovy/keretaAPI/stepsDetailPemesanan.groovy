@@ -4,6 +4,9 @@ import static com.kms.katalon.core.testcase.TestCaseFactory.findTestCase
 import static com.kms.katalon.core.testdata.TestDataFactory.findTestData
 import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import com.kms.katalon.core.annotation.Keyword
 import com.kms.katalon.core.checkpoint.Checkpoint
 import com.kms.katalon.core.checkpoint.CheckpointFactory
@@ -55,7 +58,10 @@ class stepsDetailPemesanan {
 		WebUI.click(firstCard)
 
 		TestObject steps = new TestObject().addProperty("xpath", ConditionType.EQUALS, "//div[contains(@class,'Step_circle_active')]/following-sibling::span")
+		WebUI.waitForElementNotPresent(steps, 0)
 		WebUI.verifyElementText(steps, "Detail Pemesanan")
+		
+		bookingReviewCards()
 	}
 
 	@When("pengguna mengisi detail penumpang")
@@ -157,5 +163,56 @@ class stepsDetailPemesanan {
 		String nik_xpath = "(//input[@id='nomor-nik'])[$i]"
 		TestObject nik_object = new TestObject().addProperty("xpath", ConditionType.EQUALS, nik_xpath)
 		WebUI.setText(nik_object, nik)
+	}
+	
+	def bookingReviewCards() {
+
+		String departDate_xpath = "(//div[@data-testid='booking-review-cards']//span[@class='Text_text__DSnue Text_variant_highEmphasis__ubq3k Text_size_b3__6n_9j'])[1]"
+		String departDate = WebUI.getText(new TestObject().addProperty("xpath", ConditionType.EQUALS, departDate_xpath))
+		println(departDate)
+		println(GlobalVariable.departDate)
+		
+		DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("d MMM yy", new Locale("id", "ID"))
+		DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("EEE, d MMM", new Locale("id", "ID"))
+		LocalDate date = LocalDate.parse(GlobalVariable.departDate, inputFormatter)
+		String formattedDate = date.format(outputFormatter)
+		println "Parsed date: " + formattedDate
+		assert departDate == formattedDate
+		
+		String time_xpath = "(//div[@data-testid='booking-review-cards']//span[@class='Text_text__DSnue Text_variant_highEmphasis__ubq3k Text_size_b3__6n_9j'])[2]"
+		String time = WebUI.getText(new TestObject().addProperty("xpath", ConditionType.EQUALS, time_xpath))
+		println(time)
+		println(GlobalVariable.departTime)
+		println(GlobalVariable.departTime)
+		assert time == GlobalVariable.departTime + " - " + GlobalVariable.arrivalTime
+		
+		String trainName_xpath = "(//div[@data-testid='booking-review-cards']//span[@class='Text_text__DSnue Text_variant_highEmphasis__ubq3k Text_size_b3__6n_9j'])[3]"
+		String trainName = WebUI.getText(new TestObject().addProperty("xpath", ConditionType.EQUALS, trainName_xpath))
+		println(trainName)
+		println(GlobalVariable.trainName)
+		assert trainName == GlobalVariable.trainName
+		
+		String trainClass_xpath = "(//div[@data-testid='booking-review-cards']//span[@class='Text_text__DSnue Text_variant_highEmphasis__ubq3k Text_size_b3__6n_9j'])[4]"
+		String trainClass = WebUI.getText(new TestObject().addProperty("xpath", ConditionType.EQUALS, trainClass_xpath))
+		println(trainClass)
+		String classKA = GlobalVariable.trainClass
+		assert classKA.contains(trainClass)
+		
+		String totalPrice_xpath = "Text_text__DSnue Text_size_b1__bsanT Text_weight_bold__m4BAY"
+		String totalText = WebUI.getText(new TestObject().addProperty("class", ConditionType.EQUALS, totalPrice_xpath))
+		def totalPrice = Integer.parseInt(totalText.replaceAll("[^\\d]", ""))
+		assert totalPrice == GlobalVariable.totalPrice
+		
+		String originStation_xpath = "(//div[contains(@class, 'clamp_2_line')])[1]"
+		String originStation = WebUI.getText(new TestObject().addProperty("xpath", ConditionType.EQUALS, originStation_xpath))
+		println(originStation)
+		println(GlobalVariable.originStation)
+		assert originStation == GlobalVariable.originStation
+		
+		String destinationStation_xpath = "(//div[contains(@class, 'clamp_2_line')])[2]"
+		String destinationStation = WebUI.getText(new TestObject().addProperty("xpath", ConditionType.EQUALS, destinationStation_xpath))
+		println(originStation)
+		println(GlobalVariable.destinationStation)
+		assert destinationStation == GlobalVariable.destinationStation
 	}
 }

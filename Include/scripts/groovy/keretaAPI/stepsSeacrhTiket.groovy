@@ -186,7 +186,7 @@ class stepsSeacrhTiket {
 		}
 
 		WebUI.click(findTestObject('Object Repository/Kereta API/btn_Selesai'))
-		
+
 		GlobalVariable.totalAdult = totalAdult
 		GlobalVariable.totalInfant = totalInfant
 	}
@@ -209,11 +209,11 @@ class stepsSeacrhTiket {
 		DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("d MMM yy", new java.util.Locale("id"))
 
 		LocalDate dateDepart = LocalDate.parse(departDate, inputFormatter)
-		String formattedDate = dateDepart.format(outputFormatter)
-		println('Formatted departure date: ' + formattedDate)
+		GlobalVariable.departDate = dateDepart.format(outputFormatter)
+		println('Formatted departure date: ' + GlobalVariable.departDate)
 
 		String getDate = WebUI.getText(new TestObject().addProperty("class", ConditionType.EQUALS, "ChangeSearch_departure_date__d7iOq Text_text__DSnue Text_size_b2__y3Q2E Text_weight_bold__m4BAY"))
-		assert getDate.contains(formattedDate)
+		assert getDate.contains(GlobalVariable.departDate)
 
 		boolean isOriginTextPresent = false
 
@@ -250,45 +250,55 @@ class stepsSeacrhTiket {
 		} else {
 			println("At least one of the specified destination is present on the page.")
 		}
-		
+
 		verifyRoutePrice()
 
 
 	}
-	
+
 	def verifyRoutePrice() {
 		String xpath_price = "//span[@class='Text_text__DSnue Text_variant_alert__7jMF3 Text_size_b2__y3Q2E Text_weight_bold__m4BAY']"
 		String gettext_price = WebUI.getText(new TestObject().addProperty("xpath", ConditionType.EQUALS, xpath_price))
 		String priceText = gettext_price.split(" ")[1]
 		int price = Integer.parseInt(priceText.replaceAll("[^\\d]", ""))
 		println("price = $price")
-		
+
 		WebUI.click(findTestObject('Object Repository/Kereta API/btn_Lihat Detail'))
-		
+
 		WebUI.click(findTestObject('Kereta API/btn_Lihat Detail (Rute)'))
-		
+
+		String xpath_route = "//header[contains(@class, 'Modal_modal_header')]/h2"
+		String gettext_route = WebUI.getText(new TestObject().addProperty("xpath", ConditionType.EQUALS, xpath_route))
+		GlobalVariable.originCity = gettext_route.split(" ")[0]
+		GlobalVariable.destinationCity = gettext_route.split(" ")[2]
+
 		TestObject departTime_object = new TestObject().addProperty("xpath", ConditionType.EQUALS, "//p[contains(@class, 'TripRoute_time_origin')]")
-		String departTime = WebUI.getText(departTime_object)
-		
+		GlobalVariable.departTime = WebUI.getText(departTime_object)
+
 		TestObject arrivalTime_object = new TestObject().addProperty("xpath", ConditionType.EQUALS, "//p[contains(@class, 'TripRoute_time_destination')]")
-		String arrivalTime = WebUI.getText(arrivalTime_object)
-		
+		GlobalVariable.arrivalTime = WebUI.getText(arrivalTime_object)
+
 		TestObject trainName_object = new TestObject().addProperty("xpath", ConditionType.EQUALS, "(//div[contains(@class, 'TrainInformation_wagon')]/span)[1]")
-		String trainName = WebUI.getText(trainName_object)
-		
+		GlobalVariable.trainName = WebUI.getText(trainName_object)
+
 		TestObject trainClass_object = new TestObject().addProperty("xpath", ConditionType.EQUALS, "(//div[contains(@class, 'TrainInformation_wagon')]/span)[2]")
-		String trainClass = WebUI.getText(trainClass_object)
-		
-		
+		GlobalVariable.trainClass = WebUI.getText(trainClass_object)
+
+		TestObject originStation_object = new TestObject().addProperty("xpath", ConditionType.EQUALS, "(//div[contains(@class, 'TripRoute_name')])[1]/p")
+		GlobalVariable.originStation = WebUI.getText(originStation_object)
+
+		TestObject destinationStation_object = new TestObject().addProperty("xpath", ConditionType.EQUALS, "(//div[contains(@class, 'TripRoute_name')])[2]/p")
+		GlobalVariable.destinationStation = WebUI.getText(destinationStation_object)
+
 		WebUI.click(findTestObject('Kereta API/btn_Lihat Detail (Harga)'))
-		
+
 		String getText_total = WebUI.getText(new TestObject().addProperty("xpath", ConditionType.EQUALS, "//span[@data-testid='product_details_total_price_footer']"))
 		String totalText = getText_total.split(" ")[1]
-		int total = Integer.parseInt(totalText.replaceAll("[^\\d]", ""))
-		println("totalPrice = $total")
-		
-		assert total == ( price * GlobalVariable.totalAdult)
-		
+		GlobalVariable.totalPrice = Integer.parseInt(totalText.replaceAll("[^\\d]", ""))
+		println("totalPrice = $GlobalVariable.totalPrice")
+
+		assert GlobalVariable.totalPrice == ( price * GlobalVariable.totalAdult)
+
 		WebUI.click(findTestObject('Object Repository/Kereta API/btn_Close (X)'))
 	}
 
